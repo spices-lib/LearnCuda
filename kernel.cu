@@ -21,7 +21,7 @@ __global__ void vectorAdd(int* A, int* B, int* C, int n)
 	C[i] = A[i] + B[i];
 }
 
-int main()
+int main0()
 {
 	int* A, * B, * C;
 	int* d_A, * d_B, * d_C;

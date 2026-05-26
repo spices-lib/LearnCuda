@@ -5,7 +5,7 @@
 #include <memory>
 #include <cuda.h>
 
-constexpr uint32_t SIZE = 2048;
+constexpr uint64_t SIZE = 1024 * 432 * 1024;
 
 __global__ void test01()
 {
@@ -49,7 +49,7 @@ int main()
 	cudaEventCreate(&stop);
 
 	cudaEventRecord(start);
-	vectorAdd << <64, 32 >> > (d_A, d_B, d_C, SIZE);
+	vectorAdd <<<1024 * 432, 1024 >>> (d_A, d_B, d_C, SIZE);
 	cudaEventRecord(stop);
 
 	cudaMemcpy(C, d_C, size, cudaMemcpyDeviceToHost);

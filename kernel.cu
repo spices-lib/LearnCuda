@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 #include <memory>
+#include <cuda.h>
 
-constexpr uint32_t SIZE = 1024;
+constexpr uint32_t SIZE = 2048;
 
 __global__ void test01()
 {
@@ -16,7 +17,7 @@ __global__ void test01()
 
 __global__ void vectorAdd(int* A, int* B, int* C, int n)
 {
-	int i = threadIdx.x;
+	int i = threadIdx.x + blockIdx.x * blockDim.x;
 	C[i] = A[i] + B[i];
 }
 
@@ -43,16 +44,26 @@ int main()
 	cudaMemcpy(d_A, A, size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_B, B, size, cudaMemcpyHostToDevice);
 
-	vectorAdd << <1, SIZE >> > (d_A, d_B, d_C, SIZE);
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
+	cudaEventRecord(start);
+	vectorAdd << <64, 32 >> > (d_A, d_B, d_C, SIZE);
+	cudaEventRecord(stop);
 
 	cudaMemcpy(C, d_C, size, cudaMemcpyDeviceToHost);
 
-	printf("\nExecution finished\n");
-	for (int i = 0; i < SIZE; ++i)
+	cudaEventSynchronize(stop);
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+
+	printf("\nExecution finished, cost: %f milliseconds\n", milliseconds);
+	/*for (int i = 0; i < SIZE; ++i)
 	{
 		printf("%d + %d = %d", A[i], B[i], C[i]);
 		printf("\n");
-	}
+	}*/
 
 	cudaFree(d_A);
 	cudaFree(d_B);

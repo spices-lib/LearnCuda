@@ -23,6 +23,9 @@ int main()
 		printf("	Compute capability: %d.%d\n", prop.major, prop.minor);
 		printf("	Number of SMs: %d\n", prop.multiProcessorCount);
 		printf("	Max threads per block: %d\n", prop.maxThreadsPerBlock);
-
+		printf("	Max threads dimensions: x = %d, y = %d, z = %d\n", prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
+		printf("	Max grid dimensions: x = %d, y = %d, z = %d\n", prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]);
 	}
+
+	return 0;
 }

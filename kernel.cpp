@@ -31,7 +31,12 @@ int main0()
 	B = (int*)malloc(size);
 	C = (int*)malloc(size);
 
-	cudaMalloc((void**)&d_A, size);
+	// 同步错误
+	auto result = cudaMalloc((void**)&d_A, size);
+	if (result != cudaSuccess)
+	{
+		// error cudaGetErrorString(result);
+	}
 	cudaMalloc((void**)&d_B, size);
 	cudaMalloc((void**)&d_C, size);
 
@@ -49,7 +54,18 @@ int main0()
 	cudaEventCreate(&stop);
 
 	cudaEventRecord(start);
+
+	cudaFuncSetCacheConfig(vectorAdd, cudaFuncCachePreferL1);
+
 	vectorAdd <<<1024 * 432, 1024 >>> (d_A, d_B, d_C, SIZE);
+
+	// 异步错误
+	cudaError_t err = cudaGetLastError();
+	if (err != cudaSuccess)
+	{
+		// error cudaGetErrorString(err);
+	}
+
 	cudaEventRecord(stop);
 
 	cudaMemcpy(C, d_C, size, cudaMemcpyDeviceToHost);
